@@ -1,11 +1,16 @@
 package q006;
 
-import q006.value.DecimalValue;
-import q006.value.IValue;
-import q006.value.PlusValue;
-
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.Stack;
+import q006.value.DecimalValue;
+import q006.value.DivideValue;
+import q006.value.IValue;
+import q006.value.MinusValue;
+import q006.value.MultiplyValue;
+import q006.value.PlusValue;
 
 /**
  * Q006 空気を読んで改修
@@ -29,26 +34,57 @@ import java.util.List;
  * （または -1.00 など、小数点に0がついてもよい）
  */
 public class Q006 {
-    /**
-     * 逆ポーランドで記載された1行のテキストを分解する
-     * @param lineText 1行テキスト
-     * @return 分解された値リスト
-     */
-    private static List<IValue> parseLine(String lineText) {
-        List<IValue> resultList = new ArrayList<>();
-        // 空白文字で区切ってループする
-        for (String text: lineText.split("[\\s]+")) {
-            // TODO 一部処理だけ実装
-            switch (text) {
-                case "+":   // 足し算
-                    resultList.add(new PlusValue());
-                    break;
-                default:    // その他は数値として扱う
-                    resultList.add(new DecimalValue(text));
-                    break;
-            }
-        }
-        return resultList;
+
+  public static void main(final String[] args) {
+
+    System.out.println("式を逆ポーランド記法で入力してください。");
+
+    final Scanner input = new Scanner(System.in);
+    final String formula = input.nextLine();
+
+    final List<IValue> parseLine = parseLine(formula);
+    final Stack<BigDecimal> stack = new Stack<>();
+    parseLine.forEach(iValue -> iValue.execute(stack));
+
+    System.out.println("計算結果：" + stack.pop());
+  }
+
+  /**
+   * 逆ポーランドで記載された1行のテキストを分解する
+   * @param lineText 1行テキスト
+   * @return 分解された値リスト
+   */
+  private static List<IValue> parseLine(final String lineText) {
+    final List<IValue> resultList = new ArrayList<>();
+    // 空白文字で区切ってループする
+    for (final String text : lineText.split("[\\s]+")) {
+      switch (text) {
+        case "+":   // 足し算
+          resultList.add(new PlusValue());
+          break;
+        case "-":   // 引き算
+          resultList.add(new MinusValue());
+          break;
+        case "*":   // 掛け算
+          resultList.add(new MultiplyValue());
+          break;
+        case "/":
+        case "÷":   // 割り算
+          resultList.add(new DivideValue());
+          break;
+        default:    // その他は数値として扱う
+          resultList.add(new DecimalValue(text));
+          break;
+      }
     }
+    return resultList;
+  }
 }
-// 完成までの時間: xx時間 xx分
+// 完成までの時間: xx時間 15分
+/**
+ * 実行結果
+ * > Task :Q006.main()
+ * 式を逆ポーランド記法で入力してください。
+ * 1 2 + 3 / 5 3 - 2 ÷ 5 *
+ * 計算結果：5
+ */
